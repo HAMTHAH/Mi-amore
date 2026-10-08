@@ -912,55 +912,61 @@ async def test(
 # =========================================================
 
 async def send_daily_messages(
-    context: ContextTypes.DEFAULT_TYPE
-):
-
+async def send_daily_messages(context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
 
     if data.get("paused"):
-
-        logger.info(
-            "Daily messages are paused."
-        )
-
+        logger.info("Daily messages are paused.")
         return
 
-    recipients = data.get(
-        "recipients",
-        {}
-    )
+    recipients = data.get("recipients", {})
 
     if not recipients:
-
-        logger.info(
-            "No recipients."
-        )
-
+        logger.info("No recipients.")
         return
 
+    # Choose one message for this scheduled run
     message = random.choice(MESSAGES)
 
+    sent = 0
+    failed = 0
+
     for user_id in list(recipients.keys()):
-
         try:
-
             await context.bot.send_message(
                 chat_id=int(user_id),
                 text=message,
             )
-
-            logger.info(
-                "Daily message sent to %s",
-                user_id
-            )
+            sent += 1
 
         except Exception as e:
-
+            failed += 1
             logger.error(
                 "Failed sending to %s: %s",
                 user_id,
-                e
+                e,
             )
+
+    # Notify the owner after the scheduled send
+    try:
+        await context.bot.send_message(
+            chat_id=f"@{OWNER_USERNAME}",
+            text=(
+                "❤️ DAILY MESSAGE REPORT\n\n"
+                f"Message sent:\n\n{message}\n\n"
+                f"Successfully sent: {sent}\n"
+                f"Failed: {failed}\n"
+                f"Scheduled time: "
+                f"{data.get('hour', DEFAULT_HOUR):02d}:"
+                f"{data.get('minute', DEFAULT_MINUTE):02d} "
+                "Ethiopia time."
+            ),
+        )
+    except Exception as e:
+        logger.error(
+            "Could not notify owner: %s",
+            e,
+        )
 
 
 # =========================================================
