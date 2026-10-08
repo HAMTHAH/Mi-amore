@@ -911,7 +911,6 @@ async def test(
 # DAILY MESSAGE
 # =========================================================
 
-async def send_daily_messages(
 async def send_daily_messages(context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
 
