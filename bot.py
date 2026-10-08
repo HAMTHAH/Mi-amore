@@ -1,7 +1,6 @@
 import os
 import json
 import random
-import secrets
 import logging
 from datetime import time
 from zoneinfo import ZoneInfo
@@ -13,208 +12,168 @@ from telegram.ext import (
     ContextTypes,
 )
 
-# ============================================================
+# =========================================================
 # SETTINGS
-# ============================================================
+# =========================================================
 
-TOKEN = os.environ["BOT_TOKEN"]
+TOKEN = os.environ.get("BOT_TOKEN")
 
 OWNER_USERNAME = "hamthah"
 
-DATA_FILE = "love_bot_data.json"
+DATA_FILE = "/data/love_bot_data.json"
 
 TIMEZONE = ZoneInfo("Africa/Addis_Ababa")
 
 DEFAULT_HOUR = 20
 DEFAULT_MINUTE = 30
 
+
+# =========================================================
+# LOGGING
+# =========================================================
+
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO,
 )
 
-# ============================================================
+logger = logging.getLogger(__name__)
+
+
+# =========================================================
 # MESSAGES
-# ============================================================
+# =========================================================
 
 MESSAGES = [
 
-    # SWEET ❤️
+    "Just a reminder: I love you more than you probably realize ❤️",
 
-    "Just a little reminder: I love you more than you probably realize. ❤️",
+    "You randomly crossed my mind again. Honestly, you live there rent-free 😏❤️",
 
-    "I hope you know how special you are to me. I really do love you. 🥰",
+    "I hope you're having a beautiful day, because someone is definitely thinking about you right now ❤️",
 
-    "Out of everyone in this world, somehow I got lucky enough to have you. ❤️",
+    "You're my favorite notification, my favorite thought, and probably my favorite distraction 😌❤️",
 
-    "You make ordinary days feel special just by being part of them.",
+    "I don't need a reason to miss you. It just happens ❤️",
 
-    "I don't need a special occasion to tell you that I love you. I just wanted you to know. ❤️",
+    "You're dangerously easy to fall for 😏❤️",
 
-    "You're one of my favorite thoughts every single day.",
+    "Just checking in to remind you that you're loved, wanted, and very much on my mind ❤️",
 
-    "If you could see yourself through my eyes, you'd understand how beautiful you are to me. ❤️",
+    "If thinking about you counted as exercise, I'd be in incredible shape by now 😂❤️",
 
-    "I hope something makes you smile today. And if nothing does, remember that I'm here. 😘",
+    "You have no idea how often I smile because of you ❤️",
 
-    "You're one of the best things in my life. ❤️",
+    "I hope you know how special you are to me ❤️",
 
-    "My favorite notification will always be your name appearing on my phone. ❤️",
+    "Some people make your day better. You make mine better just by existing ❤️",
 
-    "You make my days better without even trying.",
+    "I still get that little feeling every time I think about you 😏❤️",
 
-    "I just wanted to remind you that someone out here is thinking about you. ❤️",
+    "You're cute. You're beautiful. You're trouble. And somehow I want all three 😂❤️",
 
-    "You have a permanent place in my heart. No rent required. 😂❤️",
+    "I miss your face. And maybe a few other things about you too 😏",
 
-    "I love having you in my life more than I can put into words.",
+    "If I could teleport right now, you'd probably have to deal with me hugging you for a very long time ❤️",
 
-    "You're one of the best things that has happened to me. ❤️",
+    "You make ordinary days feel special ❤️",
 
-    # ROMANTIC 💕
+    "I hope someone reminds you today that you're amazing. If nobody does, I'm volunteering ❤️",
 
-    "If I had to choose you all over again, I'd still choose you.",
+    "You're one of those people I could never get tired of talking to ❤️",
 
-    "I don't know what I did to deserve you, but I'm very happy I did it. 😘",
+    "I wish I could steal a little time with you right now 😏❤️",
 
-    "You somehow make my heart feel peaceful and crazy at the same time.",
+    "You are honestly becoming a very serious problem for my concentration 😂❤️",
 
-    "I want more ordinary days with you. More laughs, conversations and memories. ❤️",
+    "I don't know what you did to me, but whatever it is... keep doing it 😏",
 
-    "Sometimes I stop what I'm doing because I remembered you. That's how often you cross my mind.",
+    "You're the kind of distraction I would never complain about ❤️",
 
-    "I love the way you make me feel like I can completely be myself.",
+    "Just imagine me looking at you right now with that stupid smile you give me 😏❤️",
 
-    "You're my favorite person to miss and my favorite person to come back to.",
+    "I hope your day is treating you gently. You deserve that ❤️",
 
-    "No matter how busy my day gets, there is always a little part of it reserved for thinking about you. ❤️",
+    "You're my favorite person to annoy, flirt with, and love ❤️",
 
-    "You somehow became my favorite part of everyday life.",
+    "If I had one wish right now, I'd probably use it to be next to you ❤️",
 
-    "I love you today, and I'll probably find another reason to love you tomorrow. ❤️",
+    "You make my heart act like it has absolutely no self-control 😏",
 
-    "I don't just love you for how beautiful you are. I love the way you make me feel.",
+    "I was going to send something normal, but then I remembered who I'm talking to 😏❤️",
 
-    "If I could freeze one feeling, it would be the feeling of being close to you. ❤️",
+    "You're cute enough to be dangerous and attractive enough to make it worse 😏",
 
-    "I hope we get to make a ridiculous amount of memories together.",
+    "I love the way you make me feel ❤️",
 
-    "You have a way of making my whole day better just by talking to me.",
+    "Every day I find another reason to love you ❤️",
 
-    "You're someone I want beside me for all the little moments in life. ❤️",
+    "You're not just someone I like. You're someone I genuinely care about ❤️",
 
-    # FLIRTY 😏
+    "I hope you smiled when you saw this. If not, I'm sending another one 😂❤️",
 
-    "Just so you know, you're looking dangerously good in my imagination today. 😏",
+    "Missing you is becoming a daily habit ❤️",
 
-    "I was trying to concentrate today, then you crossed my mind. That was the end of that. 😂❤️",
+    "I want to be the reason you randomly smile at your phone ❤️",
 
-    "You really should stop being so attractive. I'm trying to behave. 😏",
+    "You're pretty much my favorite thought of the day ❤️",
 
-    "I don't know what's more dangerous: your smile or what it does to me. 😘",
+    "I don't say it every minute, but I hope you know I love you every minute ❤️",
 
-    "If you were here right now, I'd probably forget whatever I was supposed to be doing. 😏",
+    "You have this annoying ability to make me miss you even when we just talked 😂❤️",
 
-    "You're becoming a serious distraction, and honestly, I don't want the problem fixed. ❤️",
+    "If I were beside you right now, I'd probably refuse to let you go 😏❤️",
 
-    "I hope you're ready for me to flirt with you again today. 😏",
+    "You are absolutely worth every bit of affection I have ❤️",
 
-    "You have absolutely no business looking that good and expecting me to act normal.",
+    "I hope you know that somewhere out there, someone is thinking about you and smiling ❤️",
 
-    "I miss your face. And maybe a few other things about you too. 😏❤️",
+    "You make my heart feel ridiculously soft ❤️",
 
-    "Today's reminder: you're ridiculously attractive. 😘",
+    "I want more memories with you. A lot more ❤️",
 
-    "I swear you get prettier every time I see you.",
+    "You're my favorite kind of trouble 😏❤️",
 
-    "You have a talent for making me smile at my phone like an idiot. 😏",
+    "I would choose you again. And again. And again ❤️",
 
-    "I should probably stop thinking about you so much. But where's the fun in that? 😂❤️",
+    "You're beautiful in ways that have nothing to do with looks ❤️",
 
-    "If flirting with you were a job, I'd be employee of the month every month. 😂❤️",
+    "I love hearing from you. Even a simple message from you can change my mood ❤️",
 
-    "You're dangerously close to becoming my favorite distraction. 😏",
+    "I wish I could give you a hug right now. A very long one ❤️",
 
-    # SUGGESTIVE 🔥
+    "You're the person I want to tell all my random thoughts to 😂❤️",
 
-    "I have a few thoughts about you that definitely shouldn't be sent during a family dinner. 😏🔥",
+    "You make me want to be closer to you every day ❤️",
 
-    "You're making it very difficult for me to keep my thoughts innocent today.",
+    "I hope you never forget how wanted and appreciated you are ❤️",
 
-    "If you were next to me right now, I don't think we'd spend much time talking. 😏",
+    "I have a confession: I think about you way more than I should 😏❤️",
 
-    "I miss being close to you in ways that are probably better demonstrated than explained. ❤️",
+    "You're slowly becoming my favorite part of every day ❤️",
 
-    "There are certain things I want to whisper in your ear instead of typing here. 😏",
+    "If missing someone was illegal, I'd already be in serious trouble 😂❤️",
 
-    "You're the reason some of my thoughts need a warning label. 😂🔥",
+    "I like you. A lot. Possibly an unreasonable amount 😏❤️",
 
-    "I can't decide whether I want to cuddle you or completely ruin your ability to concentrate. 😏",
+    "You have my attention, my affection, and probably way too much of my imagination 😏",
 
-    "Just thinking about being alone with you is enough to put a smile on my face. ❤️‍🔥",
+    "I hope today gives you at least one reason to smile. I'll happily be that reason ❤️",
 
-    "You have a talent for making my imagination work overtime.",
+    "You're the kind of person I'd happily get lost with ❤️",
 
-    "You make innocent thoughts become suspiciously less innocent. 😏",
+    "I don't need perfect days. I just need more days with you ❤️",
 
-    "Some thoughts about you are definitely better kept between us. 🔥",
+    "You're my little daily reminder that life can be really sweet ❤️",
 
-    "Let's just say... you're giving my imagination a lot to work with today. 😏❤️",
+    "I love you. Just thought you should know that today ❤️",
 
-    "I miss your touch more than I probably should admit. ❤️‍🔥",
-
-    "You have no idea how much trouble you cause inside my head. 😏",
-
-    "I have a feeling we'd have a lot of fun if we were alone together. 😏🔥",
-
-    # GOOD MORNING ☀️
-
-    "Good morning, beautiful. I hope today treats you as kindly as you deserve. ❤️",
-
-    "Wake up knowing that someone out here is already thinking about you. 😘",
-
-    "Good morning, my favorite person. Go make today yours. ❤️",
-
-    "I hope your morning starts with a smile. Consider this your first reason. 😘",
-
-    "Morning reminder: you're loved, you're beautiful, and you're stuck with me. 😂❤️",
-
-    "Good morning, gorgeous. I hope your day is as beautiful as you are. ❤️",
-
-    "First thought of the day? You. Obviously. 😘",
-
-    "Good morning, love. Just sending you a little reminder that you're special to me. ❤️",
-
-    "I hope you woke up smiling because somebody definitely woke up thinking about you. 😏❤️",
-
-    "Good morning, beautiful. Now go be amazing like you always are. ❤️",
-
-    # PLAYFUL 😂
-
-    "Daily reminder: yes, I still love you. Unfortunately for you, you're stuck with me. 😂❤️",
-
-    "I considered sending you something normal today. Then I remembered who I was talking to. 😏",
-
-    "Breaking news: I still have a crush on you. More details tomorrow. 😂❤️",
-
-    "I love you. That's the message. There will be no further questions at this time. 😂",
-
-    "You are officially today's favorite person. Don't let it go to your head. 😌❤️",
-
-    "I was going to send you a boring message, but you're too cute for boring messages. 😏",
-
-    "Reminder: you're beautiful. Also, yes, I'm still obsessed with you. 😂❤️",
-
-    "I hope you're having a good day. If not, I'm officially volunteering to make it better. 😘",
-
-    "You're lucky I like you this much. Actually, I'm the lucky one. ❤️😂",
-
-    "I don't know how you managed to become this important to me, but here we are. ❤️",
 ]
 
-# ============================================================
+
+# =========================================================
 # DATA
-# ============================================================
+# =========================================================
 
 def default_data():
     return {
@@ -227,32 +186,41 @@ def default_data():
 
 
 def load_data():
-    if not os.path.exists(DATA_FILE):
-        return default_data()
-
     try:
-        with open(DATA_FILE, "r", encoding="utf-8") as file:
-            saved = json.load(file)
+        if not os.path.exists(DATA_FILE):
+            return default_data()
 
-        data = default_data()
-        data.update(saved)
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        # Make sure missing keys don't break the bot
+        defaults = default_data()
+
+        for key, value in defaults.items():
+            if key not in data:
+                data[key] = value
 
         return data
 
-    except Exception:
+    except Exception as e:
+        logger.error("Could not load data: %s", e)
         return default_data()
 
 
-def save_data():
-    with open(DATA_FILE, "w", encoding="utf-8") as file:
-        json.dump(data, file, indent=4)
+def save_data(data):
+    try:
+        os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
+
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+
+    except Exception as e:
+        logger.error("Could not save data: %s", e)
 
 
-data = load_data()
-
-# ============================================================
+# =========================================================
 # OWNER CHECK
-# ============================================================
+# =========================================================
 
 def is_owner(update: Update):
 
@@ -261,75 +229,102 @@ def is_owner(update: Update):
     if not user:
         return False
 
-    if not user.username:
+    username = user.username
+
+    if not username:
         return False
 
-    return user.username.lower() == OWNER_USERNAME.lower()
+    return username.lower() == OWNER_USERNAME.lower()
 
 
-# ============================================================
-# OWNER PANEL
-# ============================================================
+# =========================================================
+# START
+# =========================================================
 
-async def owner(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    if not is_owner(update):
-        await update.message.reply_text(
-            "❌ Owner only."
-        )
+    user = update.effective_user
+
+    if not user:
         return
 
-    await update.message.reply_text(
-        "❤️ LOVE BOT CONTROL\n\n"
-
-        "/connect - Create recipient connection code\n"
-        "/list - List all recipients\n"
-        "/remove ID - Remove a recipient\n\n"
-
-        "/test - Send a test message to everyone\n"
-        "/time 20:30 - Set daily sending time\n"
-        "/pause - Pause daily messages\n"
-        "/resume - Resume daily messages\n"
-        "/status - Show bot status\n"
+    logger.info(
+        "START received from %s (%s)",
+        user.username,
+        user.id,
     )
 
+    if is_owner(update):
 
-# ============================================================
-# CREATE CONNECTION CODE
-# ============================================================
+        await update.message.reply_text(
+            "❤️ Love Reminder Bot is online!\n\n"
+            "You are the owner.\n\n"
+            "Commands:\n"
+            "/connect - Add a recipient\n"
+            "/list - Show recipients\n"
+            "/remove - Remove a recipient\n"
+            "/test - Send a test message\n"
+            "/pause - Pause daily messages\n"
+            "/resume - Resume daily messages\n"
+            "/time - Change sending time\n"
+            "/status - Show bot status"
+        )
+
+    else:
+
+        await update.message.reply_text(
+            "❤️ Hey!\n\n"
+            "This is a private Love Reminder Bot.\n\n"
+            "If someone gave you a connection code, use:\n\n"
+            "/join CODE\n\n"
+            "Example:\n"
+            "/join ABC123"
+        )
+
+
+# =========================================================
+# CONNECT
+# =========================================================
 
 async def connect(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not is_owner(update):
         await update.message.reply_text(
-            "❌ Owner only."
+            "⛔ Only the owner can create a connection code."
         )
         return
 
-    code = secrets.token_hex(3).upper()
+    code = "".join(
+        random.choices(
+            "ABCDEFGHJKLMNPQRSTUVWXYZ23456789",
+            k=6
+        )
+    )
 
+    data = load_data()
     data["connect_code"] = code
-
-    save_data()
+    save_data(data)
 
     await update.message.reply_text(
-        "💕 NEW RECIPIENT CODE\n\n"
-
-        f"🔐 {code}\n\n"
-
+        "🔗 CONNECTION CODE\n\n"
+        f"Your code is:\n\n"
+        f"👉 {code}\n\n"
         "Send this code to the person you want to add.\n\n"
-
-        "They must open your bot and send:\n\n"
-
+        "They should open the bot and send:\n"
         f"/join {code}"
     )
 
 
-# ============================================================
-# RECIPIENT JOINS
-# ============================================================
+# =========================================================
+# JOIN
+# =========================================================
 
 async def join(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    user = update.effective_user
+
+    if not user:
+        return
 
     if not context.args:
 
@@ -341,18 +336,21 @@ async def join(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         return
 
-    code = context.args[0].upper()
+    entered_code = context.args[0].upper().strip()
 
-    if not data.get("connect_code"):
+    data = load_data()
+
+    saved_code = data.get("connect_code")
+
+    if not saved_code:
 
         await update.message.reply_text(
-            "❌ No active connection code.\n"
-            "Ask the bot owner for a new one."
+            "❌ There is no active connection code right now."
         )
 
         return
 
-    if code != data["connect_code"]:
+    if entered_code != saved_code:
 
         await update.message.reply_text(
             "❌ Invalid connection code."
@@ -360,36 +358,57 @@ async def join(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         return
 
-    user = update.effective_user
+    user_id = str(user.id)
 
-    chat_id = update.effective_chat.id
+    name = user.first_name or "Recipient"
 
-    username = user.username
+    username = user.username or ""
 
-    name = user.first_name or "Unknown"
-
-    # Save recipient
-    data["recipients"][str(chat_id)] = {
+    data["recipients"][user_id] = {
         "name": name,
         "username": username,
-        "last_message": None,
+        "added": True,
     }
 
     # Code becomes invalid after use
     data["connect_code"] = None
 
-    save_data()
+    save_data(data)
 
     await update.message.reply_text(
         "❤️ You're connected!\n\n"
-        "You'll now receive a little reminder "
-        "every day. 💕"
+        "You'll now receive a daily love reminder. 💕\n\n"
+        "No action is needed from you."
     )
 
+    # Tell owner
+    try:
 
-# ============================================================
-# LIST RECIPIENTS
-# ============================================================
+        owner = await context.bot.get_chat(
+            f"@{OWNER_USERNAME}"
+        )
+
+        await context.bot.send_message(
+            chat_id=owner.id,
+            text=(
+                "❤️ NEW RECIPIENT ADDED\n\n"
+                f"Name: {name}\n"
+                f"Username: @{username if username else 'none'}\n"
+                f"ID: {user.id}"
+            ),
+        )
+
+    except Exception as e:
+
+        logger.warning(
+            "Could not notify owner: %s",
+            e
+        )
+
+
+# =========================================================
+# LIST
+# =========================================================
 
 async def list_recipients(
     update: Update,
@@ -399,27 +418,29 @@ async def list_recipients(
     if not is_owner(update):
 
         await update.message.reply_text(
-            "❌ Owner only."
+            "⛔ Owner only."
         )
 
         return
 
-    recipients = data["recipients"]
+    data = load_data()
+
+    recipients = data.get("recipients", {})
 
     if not recipients:
 
         await update.message.reply_text(
-            "📋 No recipients connected yet.\n\n"
-            "Use /connect to create a connection code."
+            "📭 No recipients connected yet."
         )
 
         return
 
-    text = "👥 RECIPIENTS\n\n"
+    lines = ["❤️ RECIPIENTS\n"]
 
-    number = 1
-
-    for chat_id, person in recipients.items():
+    for i, (user_id, person) in enumerate(
+        recipients.items(),
+        start=1
+    ):
 
         name = person.get("name", "Unknown")
         username = person.get("username")
@@ -427,31 +448,27 @@ async def list_recipients(
         if username:
             display = f"@{username}"
         else:
-            display = name
+            display = f"ID: {user_id}"
 
-        text += (
-            f"{number}. ❤️ {display}\n"
-            f"   ID: `{chat_id}`\n\n"
+        lines.append(
+            f"{i}. {name} — {display}"
         )
 
-        number += 1
-
     await update.message.reply_text(
-        text,
-        parse_mode="Markdown"
+        "\n".join(lines)
     )
 
 
-# ============================================================
-# REMOVE RECIPIENT
-# ============================================================
+# =========================================================
+# REMOVE
+# =========================================================
 
 async def remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not is_owner(update):
 
         await update.message.reply_text(
-            "❌ Owner only."
+            "⛔ Owner only."
         )
 
         return
@@ -460,15 +477,16 @@ async def remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text(
             "Use:\n"
-            "/remove CHAT_ID\n\n"
-            "Get the ID from /list."
+            "/remove USER_ID"
         )
 
         return
 
-    chat_id = context.args[0]
+    user_id = context.args[0]
 
-    if chat_id not in data["recipients"]:
+    data = load_data()
+
+    if user_id not in data["recipients"]:
 
         await update.message.reply_text(
             "❌ Recipient not found."
@@ -476,302 +494,346 @@ async def remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         return
 
-    person = data["recipients"].pop(chat_id)
+    removed = data["recipients"].pop(user_id)
 
-    save_data()
+    save_data(data)
 
     await update.message.reply_text(
-        f"✅ Removed {person.get('name', 'recipient')}."
+        f"✅ Removed {removed.get('name', 'recipient')}."
     )
 
 
-# ============================================================
+# =========================================================
 # TEST
-# ============================================================
+# =========================================================
 
 async def test(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not is_owner(update):
 
         await update.message.reply_text(
-            "❌ Owner only."
+            "⛔ Owner only."
         )
 
         return
 
-    recipients = data["recipients"]
+    data = load_data()
+
+    recipients = data.get("recipients", {})
 
     if not recipients:
 
         await update.message.reply_text(
-            "❌ No recipients connected."
+            "📭 No recipients connected."
         )
 
         return
 
+    message = random.choice(MESSAGES)
+
     sent = 0
 
-    for chat_id, person in recipients.items():
-
-        message = random.choice(MESSAGES)
+    for user_id in recipients:
 
         try:
 
             await context.bot.send_message(
-                chat_id=int(chat_id),
+                chat_id=int(user_id),
                 text=message,
             )
-
-            person["last_message"] = message
 
             sent += 1
 
         except Exception as e:
 
-            logging.error(
-                f"Could not message {chat_id}: {e}"
+            logger.error(
+                "Could not send test to %s: %s",
+                user_id,
+                e
             )
 
-    save_data()
-
     await update.message.reply_text(
-        f"✅ Test message sent to {sent} recipient(s). ❤️"
+        f"💌 Test message sent to {sent} recipient(s)."
     )
 
 
-# ============================================================
+# =========================================================
+# DAILY MESSAGE
+# =========================================================
+
+async def send_daily_messages(
+    context: ContextTypes.DEFAULT_TYPE
+):
+
+    data = load_data()
+
+    if data.get("paused"):
+
+        logger.info("Daily messages are paused.")
+
+        return
+
+    recipients = data.get("recipients", {})
+
+    if not recipients:
+
+        logger.info("No recipients.")
+
+        return
+
+    message = random.choice(MESSAGES)
+
+    for user_id in list(recipients.keys()):
+
+        try:
+
+            await context.bot.send_message(
+                chat_id=int(user_id),
+                text=message,
+            )
+
+            logger.info(
+                "Daily message sent to %s",
+                user_id
+            )
+
+        except Exception as e:
+
+            logger.error(
+                "Failed sending to %s: %s",
+                user_id,
+                e
+            )
+
+
+# =========================================================
 # PAUSE
-# ============================================================
+# =========================================================
 
 async def pause(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not is_owner(update):
 
         await update.message.reply_text(
-            "❌ Owner only."
+            "⛔ Owner only."
         )
 
         return
 
+    data = load_data()
+
     data["paused"] = True
 
-    save_data()
+    save_data(data)
 
     await update.message.reply_text(
-        "⏸️ Daily messages paused."
+        "⏸ Daily messages paused."
     )
 
 
-# ============================================================
+# =========================================================
 # RESUME
-# ============================================================
+# =========================================================
 
 async def resume(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not is_owner(update):
 
         await update.message.reply_text(
-            "❌ Owner only."
+            "⛔ Owner only."
         )
 
         return
 
+    data = load_data()
+
     data["paused"] = False
 
-    save_data()
+    save_data(data)
 
     await update.message.reply_text(
-        "▶️ Daily messages resumed. ❤️"
+        "▶️ Daily messages resumed."
     )
 
 
-# ============================================================
-# CHANGE TIME
-# ============================================================
+# =========================================================
+# TIME
+# =========================================================
 
 async def set_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not is_owner(update):
 
         await update.message.reply_text(
-            "❌ Owner only."
+            "⛔ Owner only."
         )
 
         return
 
     if not context.args:
 
+        data = load_data()
+
         await update.message.reply_text(
-            "Use:\n"
-            "/time 20:30\n\n"
-            "Time zone: Ethiopia 🇪🇹"
+            "⏰ Current time: "
+            f"{data['hour']:02d}:{data['minute']:02d} Ethiopia time.\n\n"
+            "To change it:\n"
+            "/time 21:00"
         )
 
         return
+
+    value = context.args[0]
 
     try:
 
         hour, minute = map(
             int,
-            context.args[0].split(":")
+            value.split(":")
         )
 
-        if not (
-            0 <= hour <= 23
-            and 0 <= minute <= 59
-        ):
+        if hour < 0 or hour > 23:
             raise ValueError
 
-        data["hour"] = hour
-        data["minute"] = minute
+        if minute < 0 or minute > 59:
+            raise ValueError
 
-        save_data()
-
-        # Remove old scheduled job
-        jobs = context.job_queue.get_jobs_by_name(
-            "daily_love"
-        )
-
-        for job in jobs:
-            job.schedule_removal()
-
-        # Create new schedule
-        context.job_queue.run_daily(
-            send_daily_messages,
-            time=time(
-                hour=hour,
-                minute=minute,
-                tzinfo=TIMEZONE,
-            ),
-            name="daily_love",
-        )
-
-        await update.message.reply_text(
-            f"⏰ Daily time changed to "
-            f"{hour:02d}:{minute:02d} Ethiopia time."
-        )
-
-    except ValueError:
+    except Exception:
 
         await update.message.reply_text(
             "❌ Invalid time.\n\n"
-            "Example:\n"
-            "/time 20:30"
+            "Use:\n"
+            "/time 21:00"
         )
 
+        return
 
-# ============================================================
+    data = load_data()
+
+    data["hour"] = hour
+    data["minute"] = minute
+
+    save_data(data)
+
+    # Rebuild scheduled job
+    schedule_daily_job(context.application)
+
+    await update.message.reply_text(
+        f"⏰ Daily message time changed to "
+        f"{hour:02d}:{minute:02d} Ethiopia time."
+    )
+
+
+# =========================================================
 # STATUS
-# ============================================================
+# =========================================================
 
 async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not is_owner(update):
 
         await update.message.reply_text(
-            "❌ Owner only."
+            "⛔ Owner only."
         )
 
         return
 
-    count = len(data["recipients"])
+    data = load_data()
 
-    state = (
-        "⏸️ PAUSED"
-        if data["paused"]
-        else "▶️ ACTIVE"
-    )
+    recipients = data.get("recipients", {})
+
+    paused = data.get("paused", False)
+
+    hour = data.get("hour", DEFAULT_HOUR)
+    minute = data.get("minute", DEFAULT_MINUTE)
 
     await update.message.reply_text(
         "❤️ LOVE BOT STATUS\n\n"
-
-        f"Status: {state}\n"
-        f"Recipients: {count}\n"
-        f"Daily time: "
-        f"{data['hour']:02d}:{data['minute']:02d} "
-        f"Ethiopia time\n"
-        f"Messages available: {len(MESSAGES)}"
+        f"Recipients: {len(recipients)}\n"
+        f"Daily time: {hour:02d}:{minute:02d}\n"
+        f"Timezone: Ethiopia\n"
+        f"Status: {'⏸ Paused' if paused else '▶️ Active'}"
     )
 
 
-# ============================================================
-# DAILY MESSAGE
-# ============================================================
+# =========================================================
+# SCHEDULE
+# =========================================================
 
-async def send_daily_messages(
+def schedule_daily_job(application):
+
+    job_queue = application.job_queue
+
+    if job_queue is None:
+        logger.error(
+            "Job queue is unavailable."
+        )
+        return
+
+    # Remove old daily job
+    for job in job_queue.get_jobs_by_name(
+        "love_daily_message"
+    ):
+        job.schedule_removal()
+
+    data = load_data()
+
+    hour = data.get(
+        "hour",
+        DEFAULT_HOUR
+    )
+
+    minute = data.get(
+        "minute",
+        DEFAULT_MINUTE
+    )
+
+    job_queue.run_daily(
+        send_daily_messages,
+        time=time(
+            hour=hour,
+            minute=minute,
+            tzinfo=TIMEZONE,
+        ),
+        name="love_daily_message",
+    )
+
+    logger.info(
+        "Daily message scheduled for %02d:%02d Ethiopia time",
+        hour,
+        minute,
+    )
+
+
+# =========================================================
+# ERROR HANDLER
+# =========================================================
+
+async def error_handler(
+    update: object,
     context: ContextTypes.DEFAULT_TYPE
 ):
 
-    if data["paused"]:
-        logging.info("Daily messages are paused.")
-        return
-
-    recipients = data["recipients"]
-
-    if not recipients:
-
-        logging.info(
-            "No recipients connected."
-        )
-
-        return
-
-    for chat_id, person in list(recipients.items()):
-
-        message = random.choice(MESSAGES)
-
-        # Don't immediately repeat the same message
-        if len(MESSAGES) > 1:
-
-            while (
-                message == person.get("last_message")
-            ):
-                message = random.choice(MESSAGES)
-
-        try:
-
-            await context.bot.send_message(
-                chat_id=int(chat_id),
-                text=message,
-            )
-
-            person["last_message"] = message
-
-            logging.info(
-                f"Message sent to {chat_id}"
-            )
-
-        except Exception as e:
-
-            logging.error(
-                f"Failed to send to {chat_id}: {e}"
-            )
-
-    save_data()
-
-
-# ============================================================
-# SCHEDULE
-# ============================================================
-
-def setup_daily_job(application):
-
-    application.job_queue.run_daily(
-        send_daily_messages,
-        time=time(
-            hour=data["hour"],
-            minute=data["minute"],
-            tzinfo=TIMEZONE,
-        ),
-        name="daily_love",
+    logger.error(
+        "Bot error: %s",
+        context.error,
+        exc_info=True,
     )
 
 
-# ============================================================
+# =========================================================
 # MAIN
-# ============================================================
+# =========================================================
 
 def main():
+
+    if not TOKEN:
+
+        raise RuntimeError(
+            "BOT_TOKEN environment variable is missing."
+        )
+
+    logger.info("Starting Love Reminder Bot...")
 
     application = (
         Application.builder()
@@ -779,13 +841,17 @@ def main():
         .build()
     )
 
-    # Owner commands
+    # Commands
     application.add_handler(
-        CommandHandler("owner", owner)
+        CommandHandler("start", start)
     )
 
     application.add_handler(
         CommandHandler("connect", connect)
+    )
+
+    application.add_handler(
+        CommandHandler("join", join)
     )
 
     application.add_handler(
@@ -816,16 +882,18 @@ def main():
         CommandHandler("status", status)
     )
 
-    # Recipient command
-    application.add_handler(
-        CommandHandler("join", join)
+    application.add_error_handler(
+        error_handler
     )
 
-    setup_daily_job(application)
+    # Schedule daily messages
+    schedule_daily_job(application)
 
-    print("❤️ Multi-Recipient Love Bot is running...")
+    logger.info("Bot is running.")
 
-    application.run_polling()
+    application.run_polling(
+        drop_pending_updates=True
+    )
 
 
 if __name__ == "__main__":
