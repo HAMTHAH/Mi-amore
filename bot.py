@@ -856,25 +856,26 @@ async def test(
 ):
 
     if not is_owner(update):
-
         await update.message.reply_text(
             "Owner only."
         )
-
         return
 
     data = load_data()
 
-    recipients = data.get("recipients", {})
+    recipients = data.get(
+        "recipients",
+        {}
+    )
 
     if not recipients:
-
         await update.message.reply_text(
             "No recipients connected."
         )
-
         return
 
+    # Choose the message once
+    # The same message goes to every recipient
     message = random.choice(MESSAGES)
 
     sent = 0
@@ -898,8 +899,11 @@ async def test(
                 e
             )
 
+    # Show the exact message to the owner
     await update.message.reply_text(
-        f"❤️ Test message sent to {sent} recipient(s)."
+        "❤️ TEST MESSAGE\n\n"
+        f"{message}\n\n"
+        f"Sent to {sent} recipient(s)."
     )
 
 
